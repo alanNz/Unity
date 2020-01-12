@@ -206,9 +206,17 @@ typedef UNITY_FLOAT_TYPE UNITY_FLOAT;
 #endif
 
 #ifndef isnan
-/* NaN is the only floating point value that does NOT equal itself.
- * Therefore if n != n, then it is NaN. */
-#define isnan(n) ((n != n) ? 1 : 0)
+  #if defined (__XC16__ ) || defined(__C30__)
+    /* The Microchip XC16 and C30 compilers need some extra help here.
+     * The n != n method does not catch Infinity
+     * Converting a non-real float to bool will always be false
+     * Ref: https://www.microchip.com/forums/m1018477.aspx */
+     #define isnan(n) (((n || n) == 0))
+  #else
+    /* NaN is the only floating point value that does NOT equal itself.
+    * Therefore if n != n, then it is NaN. */
+    #define isnan(n) ((n != n) ? 1 : 0)
+  #endif
 #endif
 
 #endif
